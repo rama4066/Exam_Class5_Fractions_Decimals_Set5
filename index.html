@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 5 CBSE Maths Exam – Fractions, Decimals, Mapping Skills & Directions (Set 3)</title>
+<style>
+:root{--blue:#2563eb;--green:#16a34a;--red:#dc2626;--ink:#1e293b;--muted:#64748b}
+*{box-sizing:border-box}
+body{font-family:Segoe UI,Tahoma,sans-serif;background:#f1f5f9;margin:0;padding:18px;color:var(--ink)}
+.container{max-width:1000px;margin:auto;background:#fff;padding:24px;border-radius:14px;box-shadow:0 5px 22px #0f172a12}
+.hidden{display:none!important}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid #e2e8f0;padding-bottom:14px;margin-bottom:18px}
+.timer{font-size:20px;font-weight:800;color:#b91c1c;background:#fef2f2;padding:8px 15px;border-radius:8px}
+.main{display:flex;gap:24px}
+.question-box{flex:2;min-width:0}
+.palette{flex:1;min-width:210px;border-left:1px solid #e2e8f0;padding-left:20px;max-height:600px;overflow:auto}
+.palette-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.p-btn{padding:10px;border:1px solid #cbd5e1;background:white;border-radius:7px;font-weight:700;cursor:pointer}
+.p-btn.answered{background:#16a34a;color:white;border-color:#16a34a}
+.p-btn.active{outline:3px solid #bfdbfe;border-color:#2563eb}
+.visual-box{margin:16px 0;padding:14px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;text-align:center;min-height:90px}
+.visual-box svg{max-width:100%;height:auto}
+.option{display:block;margin:10px 0;padding:12px 14px;border:1px solid #dbe2ea;border-radius:9px;cursor:pointer;font-size:16px}
+.option:hover{background:#eff6ff;border-color:#93c5fd}
+.option input{margin-right:9px;accent-color:#2563eb}
+.controls{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:24px}
+button.nav{padding:10px 17px;border:0;border-radius:7px;cursor:pointer;font-size:15px;font-weight:700}
+.btn-secondary{background:#64748b;color:white}.btn-primary{background:#2563eb;color:white}.btn-success{background:#16a34a;color:white}
+input[type=text]{padding:12px;width:min(330px,100%);font-size:16px;border:1px solid #cbd5e1;border-radius:7px}
+.review-item{padding:12px 4px;border-bottom:1px solid #e2e8f0;line-height:1.5}
+#save-status{padding:12px;border-radius:7px;margin:14px 0;font-weight:700}
+.saving{background:#fef3c7;color:#92400e}.saved{background:#dcfce7;color:#166534}
+.small{color:var(--muted);font-size:14px}
+@media(max-width:720px){body{padding:8px}.container{padding:16px}.main{display:block}.palette{border-left:0;border-top:1px solid #e2e8f0;padding:15px 0 0;margin-top:24px;max-height:none}.palette-grid{grid-template-columns:repeat(5,1fr)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <section id="start-screen">
+    <h2>📐 Class 5 CBSE Mathematics – Online Assessment (Set 3)</h2>
+    <p><strong>Topics:</strong> Fractions, Decimals, Mapping Skills &amp; Directions</p>
+    <p><strong>Curriculum:</strong> CBSE Class 5 &nbsp;|&nbsp; <strong>Time:</strong> 60 minutes &nbsp;|&nbsp; <strong>Questions:</strong> <span id="total-q-count"></span></p>
+    <p class="small">Choose one answer for each question. You can jump between questions using the question palette. Switching browser tabs will trigger a warning.</p>
+    <p><input type="text" id="student-name" placeholder="Enter Student Full Name" autocomplete="name"></p>
+    <button class="nav btn-primary" onclick="startExam()">Start Exam</button>
+  </section>
+
+  <section id="exam-screen" class="hidden">
+    <div class="header">
+      <div><strong>Student:</strong> <span id="display-name"></span> &nbsp;|&nbsp; <strong>Tab warnings:</strong> <span id="warnings" style="color:#dc2626;font-weight:bold">0</span></div>
+      <div class="timer" id="timer">60:00</div>
+    </div>
+    <div class="main">
+      <div class="question-box">
+        <h3 id="q-title"></h3>
+        <div class="visual-box" id="visual-box"></div>
+        <div id="options-box"></div>
+        <div class="controls">
+          <button class="nav btn-secondary" onclick="prevQ()">Previous</button>
+          <button class="nav btn-primary" onclick="nextQ()">Save &amp; Next</button>
+          <button class="nav btn-success" onclick="submitExam()">Submit Exam</button>
+        </div>
+      </div>
+      <aside class="palette"><strong>Question Palette</strong><div class="palette-grid" id="palette-grid"></div><p class="small">Green = answered</p></aside>
+    </div>
+  </section>
+
+  <section id="result-screen" class="hidden">
+    <h2>🎉 Exam Completed</h2>
+    <div id="save-status" class="saving">Submitting results to teacher's sheet...</div>
+    <p><strong>Student:</strong> <span id="res-name"></span></p>
+    <p><strong>Score:</strong> <span id="res-score" style="font-size:20px;font-weight:800"></span></p>
+    <p><strong>Tab switches:</strong> <span id="res-warnings"></span></p>
+    <div id="review-box"></div>
+  </section>
+</div>
+
+<script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDkbaGgHKmvMrwaE1juPKrWycMQbl5jX7w0TIN3f4zh69kFwOPlpjvA-Abp_o8iBa-/exec";
+
+const questions = [
+ {q:"1. Add the fractions: 3/5 + 1/10.",options:["4/15","4/10","7/10","13/10"],answer:2,vis:{type:"fraction",parts:[{n:3,d:5,label:"3/5"},{n:1,d:10,label:"1/10"}]}},
+ {q:"2. Rohan painted 2/9 of a wall in the morning and 4/9 in the afternoon. What fraction of the wall is still unpainted?",options:["2/3","1/3","6/9","2/9"],answer:1,vis:{type:"fraction",parts:[{n:2,d:9,label:"Morning: 2/9"},{n:4,d:9,label:"Afternoon: 4/9"}]}},
+ {q:"3. Convert the improper fraction 31/6 into a mixed fraction.",options:["4 7/6","6 1/5","5 1/6","5 5/6"],answer:2,vis:{type:"equation",text:"31 ÷ 6 = 5 remainder 1",sub:"Mixed fraction = Quotient + (Remainder / Divisor)"}},
+ {q:"4. Which of the following fractions is equivalent to 4/7?",options:["8/21","12/21","12/14","16/21"],answer:1,vis:{type:"equation",text:"(4 × 3) / (7 × 3)",sub:"Multiply numerator and denominator by the same number"}},
+ {q:"5. Find the difference: 2/3 − 5/12.",options:["1/4","3/9","7/12","1/12"],answer:0,vis:{type:"equation",text:"8/12 − 5/12",sub:"Convert 2/3 to twelfths first"}},
+ {q:"6. Arrange these fractions in ascending order: 1/2, 3/4, 1/4, 5/8.",options:["1/4, 5/8, 1/2, 3/4","3/4, 5/8, 1/2, 1/4","1/4, 1/2, 5/8, 3/4","1/2, 1/4, 5/8, 3/4"],answer:2,vis:{type:"fraction",parts:[{n:1,d:4,label:"1/4"},{n:1,d:2,label:"1/2"},{n:5,d:8,label:"5/8"},{n:3,d:4,label:"3/4"}]}},
+ {q:"7. A ribbon is 15 m long. A tailor uses 2/5 of it for curtains. How many metres of ribbon are used?",options:["5 m","6 m","9 m","10 m"],answer:1,vis:{type:"equation",text:"2/5 of 15 m",sub:"Divide 15 by 5, then multiply by 2"}},
+ {q:"8. A pizza is cut into 8 equal slices. Meera eats 3 slices and Kabir eats 2 slices. What fraction of the pizza did they eat together?",options:["1/8","3/8","5/8","5/16"],answer:2,vis:{type:"fraction",parts:[{n:3,d:8,label:"Meera: 3/8"},{n:2,d:8,label:"Kabir: 2/8"}]}},
+ {q:"9. Express the fraction 3/4 as a decimal.",options:["0.34","0.43","0.75","1.25"],answer:2,vis:{type:"equation",text:"3/4 = 75/100",sub:"Convert to an equivalent fraction with denominator 100"}},
+ {q:"10. Calculate: 14.65 + 8.8.",options:["15.53","23.45","22.45","23.73"],answer:1,vis:{type:"equation",text:"14.65 + 8.80",sub:"Line up the decimal points before adding"}},
+ {q:"11. Subtract 15.4 from 32.06.",options:["17.66","26.66","16.66","16.12"],answer:2,vis:{type:"equation",text:"32.06 − 15.40",sub:"Pad with a zero so both have two decimal places"}},
+ {q:"12. Multiply: 3.25 × 4.",options:["12.100","13","14.25","12.5"],answer:1,vis:{type:"equation",text:"3.25 × 4",sub:"3 × 4 = 12 and 0.25 × 4 = 1"}},
+ {q:"13. Divide: 9.6 ÷ 1.2.",options:["0.8","6","8","12"],answer:2,vis:{type:"equation",text:"9.6 ÷ 1.2",sub:"Shift decimal one place right in both: 96 ÷ 12"}},
+ {q:"14. What is the place value of the digit 7 in 45.078?",options:["7 tenths (0.7)","7 hundredths (0.07)","7 thousandths (0.007)","7 tens (70)"],answer:1,vis:{type:"decimal",number:"45.078",labels:["4 tens","5 ones","0 tenths","7 hundredths","8 thousandths"]}},
+ {q:"15. A bottle holds 1.75 L of mango juice. How much juice is in 3 such bottles?",options:["3.25 L","4.50 L","5.25 L","5.75 L"],answer:2,vis:{type:"equation",text:"1.75 × 3",sub:"Multiply litres per bottle by 3"}},
+ {q:"16. A rope is 25.5 m long. A piece of 9.75 m is cut off. What is the length of the remaining rope?",options:["16.25 m","15.75 m","15.25 m","16.75 m"],answer:1,vis:{type:"equation",text:"25.50 − 9.75",sub:"Subtract the cut piece from the full length"}},
+ {q:"17. On a town map, 1 cm represents 200 m. If the distance from the Park to the Library on the map is 4.5 cm, what is the actual distance?",options:["450 m","800 m","900 m","1000 m"],answer:2,vis:{type:"map",text:"Scale: 1 cm = 200 m | Map gap = 4.5 cm",sub:"Multiply map distance (cm) by scale factor (200 m)"}},
+ {q:"18. On a map grid where each unit is 1 km, the Post Office is at (2, 1) and the School is at (2, 5). Walking straight from the Post Office to the School is how far and in which direction?",options:["4 km South","4 km North","3 km North","5 km North"],answer:1,vis:{type:"grid",points:[{x:2,y:1,label:"Post Office (2,1)"},{x:2,y:5,label:"School (2,5)"}]}},
+ {q:"19. You are facing South-East and turn 90° anti-clockwise (counter-clockwise). Which direction do you face now?",options:["North-East","South-West","North-West","South"],answer:0,vis:{type:"compass",direction:"South-East",steps:["Start: South-East","90° Anti-clockwise → North-East"]}},
+ {q:"20. A park is North-West of the railway station. In which direction is the railway station from the park?",options:["North-East","South-West","North-West","South-East"],answer:3,vis:{type:"map",text:"Park (NW) ↖ Railway Station",sub:"Reverse both cardinal parts for the opposite direction"}},
+ {q:"21. Ananya walks 4 km North, turns right and walks 3 km East, then turns right again and walks 4 km South. Where is she relative to her starting point?",options:["3 km West","3 km East","4 km South","At the start"],answer:1,vis:{type:"route",moves:["4 km North","3 km East","4 km South"],end:"3 km East of start"}},
+ {q:"22. A map uses a scale of 1 cm = 5 km. How many centimetres long on the map represents a 35 km highway stretch?",options:["5 cm","6 cm","7 cm","8 cm"],answer:2,vis:{type:"map",text:"Scale: 1 cm = 5 km | Actual = 35 km",sub:"Divide actual distance by 5 km per cm"}},
+ {q:"23. The Town Hall is North of the Museum, and the Clock Tower is East of the Museum. In which direction is the Clock Tower from the Town Hall?",options:["North-East","North-West","South-West","South-East"],answer:3,vis:{type:"map",text:"Town Hall (N of Museum) & Clock Tower (E of Museum)",sub:"From Town Hall: go South to Museum, then East to Clock Tower"}},
+ {q:"24. Standing at the centre facing West, you make a 135° clockwise turn. Which direction are you facing?",options:["South-East","North-East","South-West","North"],answer:1,vis:{type:"compass",direction:"West",steps:["West + 90° CW = North","North + 45° CW = North-East"]}},
+ {q:"25. A zoo map has a scale of 2 cm = 100 m. How many metres does 6 cm on the map represent?",options:["150 m","200 m","300 m","600 m"],answer:2,vis:{type:"map",text:"Scale: 2 cm = 100 m | Map length = 6 cm",sub:"6 cm is 3 times 2 cm"}}
+];
+
+document.getElementById("total-q-count").textContent=questions.length;
+let current=0,answers=Array(questions.length).fill(null),timeLeft=3600,timerId=null,warnings=0,active=false;
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function renderVisual(v){
+ if(!v)return "";
+ if(v.type==="fraction"){
+  return `<svg width="470" height="${v.parts.length*48+10}" viewBox="0 0 470 ${v.parts.length*48+10}">${v.parts.map((p,i)=>{let y=8+i*48,w=250/p.d;return `<text x="20" y="${y+13}" font-size="13" fill="#334155">${esc(p.label)}</text>${Array.from({length:p.d},(_,j)=>`<rect x="${20+j*w}" y="${y+19}" width="${Math.max(w-2,2)}" height="18" rx="2" fill="${j<p.n?'#60a5fa':'#e2e8f0'}"/>`).join("")}`}).join("")}</svg>`;
+ }
+ if(v.type==="equation")return `<div style="font-size:23px;font-weight:800;color:#1d4ed8;padding:8px">${esc(v.text)}</div><div class="small">${esc(v.sub||"")}</div>`;
+ if(v.type==="decimal")return `<div style="font-size:27px;font-weight:800;letter-spacing:5px;color:#1d4ed8">${esc(v.number)}</div><div class="small">${esc(v.labels.join(" • "))}</div>`;
+ if(v.type==="compass")return `<svg width="240" height="175" viewBox="0 0 240 175"><circle cx="120" cy="88" r="65" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/><path d="M120 20 L112 38 L128 38 Z M120 156 L112 138 L128 138 Z M52 88 L70 80 L70 96 Z M188 88 L170 80 L170 96 Z" fill="#2563eb"/><text x="120" y="13" text-anchor="middle" font-weight="bold">N</text><text x="120" y="173" text-anchor="middle">S</text><text x="207" y="93">E</text><text x="25" y="93">W</text><text x="120" y="92" text-anchor="middle" font-size="11" font-weight="bold">${esc(v.direction)}</text></svg><div class="small">${v.steps.map(esc).join(" → ")}</div>`;
+ if(v.type==="map")return `<div style="font-size:19px;font-weight:800;color:#1d4ed8;padding:8px">${esc(v.text)}</div><div class="small">${esc(v.sub)}</div><div style="font-size:22px;margin-top:4px">🗺️🧭</div>`;
+ if(v.type==="grid")return `<svg width="240" height="170" viewBox="0 0 240 170"><rect x="40" y="15" width="160" height="130" fill="#eff6ff" stroke="#93c5fd"/><line x1="80" y1="15" x2="80" y2="145" stroke="#cbd5e1"/><line x1="120" y1="15" x2="120" y2="145" stroke="#cbd5e1"/><line x1="160" y1="15" x2="160" y2="145" stroke="#cbd5e1"/><line x1="40" y1="47.5" x2="200" y2="47.5" stroke="#cbd5e1"/><line x1="40" y1="80" x2="200" y2="80" stroke="#cbd5e1"/><line x1="40" y1="112.5" x2="200" y2="112.5" stroke="#cbd5e1"/><circle cx="120" cy="112.5" r="5" fill="#16a34a"/><text x="128" y="116" font-size="11" font-weight="bold">Post Office (2,1)</text><circle cx="120" cy="15" r="5" fill="#dc2626"/><text x="128" y="25" font-size="11" font-weight="bold">School (2,5)</text><line x1="120" y1="112.5" x2="120" y2="20" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,3"/><text x="15" y="22" font-size="11" font-weight="bold">N ↑</text></svg>`;
+ if(v.type==="route")return `<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:8px">${v.moves.map((m,i)=>`<span style="background:#dbeafe;padding:9px 12px;border-radius:8px;font-weight:700">${i+1}. ${esc(m)}</span>`).join("")}</div><div style="font-weight:800;color:#166534">Final position: ${esc(v.end)}</div>`;
+ return "";
+}
+function startExam(){
+ const name=document.getElementById("student-name").value.trim();if(!name){alert("Please enter your name.");return;}
+ document.getElementById("display-name").textContent=name;document.getElementById("start-screen").classList.add("hidden");document.getElementById("exam-screen").classList.remove("hidden");active=true;loadQuestion(0);
+ timerId=setInterval(()=>{timeLeft--;document.getElementById("timer").textContent=`${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")}`;if(timeLeft<=0)submitExam();},1000);
+}
+function loadQuestion(i){current=i;const q=questions[i];document.getElementById("q-title").textContent=q.q;document.getElementById("visual-box").innerHTML=renderVisual(q.vis);document.getElementById("options-box").innerHTML=q.options.map((o,j)=>`<label class="option"><input type="radio" name="opt" ${answers[i]===j?"checked":""} onchange="selectOpt(${j})">${esc(o)}</label>`).join("");renderPalette();}
+function selectOpt(i){answers[current]=i;renderPalette();}
+function renderPalette(){document.getElementById("palette-grid").innerHTML=questions.map((q,i)=>`<button class="p-btn ${answers[i]!==null?"answered":""} ${i===current?"active":""}" onclick="loadQuestion(${i})">${i+1}</button>`).join("");}
+function nextQ(){if(current<questions.length-1)loadQuestion(current+1);}
+function prevQ(){if(current>0)loadQuestion(current-1);}
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&active){warnings++;document.getElementById("warnings").textContent=warnings;alert("Warning: Switching tabs is not allowed during the exam.");}});
+function submitExam(){
+ if(!active)return;if(!confirm("Are you sure you want to submit the exam?"))return;active=false;clearInterval(timerId);
+ const name=document.getElementById("student-name").value.trim();let score=0,selected=[];
+ let review="<h3>Answer Review</h3>";
+ questions.forEach((q,i)=>{const correct=answers[i]===q.answer;if(correct)score++;const chosen=answers[i]===null?"Unanswered":q.options[answers[i]];selected.push(`Q${i+1}: ${chosen}`);review+=`<div class="review-item"><strong>${esc(q.q)}</strong><br>Your answer: <span style="color:${correct?'#16a34a':'#dc2626'};font-weight:700">${esc(chosen)}</span> &nbsp;|&nbsp; Correct answer: <strong>${esc(q.options[q.answer])}</strong></div>`;});
+ document.getElementById("exam-screen").classList.add("hidden");document.getElementById("result-screen").classList.remove("hidden");document.getElementById("res-name").textContent=name;document.getElementById("res-score").textContent=`${score} / ${questions.length}`;document.getElementById("res-warnings").textContent=warnings;document.getElementById("review-box").innerHTML=review;
+ fetch(GOOGLE_SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({studentName:name,score:score,totalQuestions:questions.length,warnings:warnings,answers:selected.join(" | ")})}).then(()=>{const s=document.getElementById("save-status");s.className="saved";s.textContent="Results submitted to teacher's sheet!";}).catch(()=>{document.getElementById("save-status").textContent="Unable to confirm sheet submission. Please take a screenshot of your score.";});
+}
+</script>
+</body>
+</html>
